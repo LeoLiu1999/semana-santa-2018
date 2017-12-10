@@ -1,16 +1,8 @@
 #ifndef CONTROL
 #define CONTROL
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <sys/ipc.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include "baseHeaders.h"
+#include "helpers.h"
 
 union semun {
   int val;                 // Value for SETVAL 
