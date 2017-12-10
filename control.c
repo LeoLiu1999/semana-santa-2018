@@ -3,25 +3,33 @@
 #define LINESIZE 6940
 #define KEY 694
 
-void checkForSem(){
-  if (semget(KEY, 1, 0644) == -1){
-    printf("Semaphore does not exist\n");
+int checkForStory(){
+  int fd = open("Story", O_RDONLY);
+  if (fd == -1){
+    printf("Story does not exist, create a story with ./control -c\n");
     exit(1);
   }
+  return fd;
+}
+
+void printStory(){
+    int fd = checkForStory();
+    
+    struct stat sb;
+    stat("Story", &sb);
+
+    int size = sb.st_size;
+    char buf[size];
+    read(fd, buf, size);
+    buf[size] = 0;    
+   
+    printf("\nSTORY:\n\n%s\n", buf);
 }
 
 int main(int argc, char **argv){
 
-  int sem, fd, sizeLine;
+  int sem, fd, shm;
   char *currLine;
-
-  union semun {
-    int              val;    /* Value for SETVAL */
-    struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
-    unsigned short  *array;  /* Array for GETALL, SETALL */
-    struct seminfo  *__buf;  /* Buffer for IPC_INFO
-				(Linux-specific) */
-  };
 
   union semun us;
   
@@ -32,13 +40,10 @@ int main(int argc, char **argv){
     exit(1);
   }
 
-  //creates a semaphore and sets its value
+  //creates a semaphore, shared memory, and file
   else if (!strcmp(argv[1], "-c")){
-    //Create shared memory for line size
-    sizeLine = shmget( LINESIZE, sizeof(int), IPC_CREAT | 0600);
-
     //Create semaphore and set it to one
-    sem = semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0600);
+    sem = semget(KEY, 1, IPC_CREAT | IPC_EXCL | 0644);
     if (sem == -1){
       printf("Semaphore already exists\n");
       return 0;
@@ -46,30 +51,40 @@ int main(int argc, char **argv){
     us.val = 1;
     semctl(sem, 0, SETVAL, us); 
     printf("Set semaphore %d's value to %d\n", sem, semctl(sem, 0, GETVAL));
+    
+    //Create shared memory for line size
+    shm = shmget( LINESIZE, sizeof(int), IPC_CREAT | 0644);
+    printf("Set Shared Memory\n");
+
+    //Create file
+    fd = open("Story", O_CREAT | O_TRUNC, 0644);
+    close(fd);
+    printf("Story file created\n");
   }
 
-  /*
-  //views current value of semaphore
+  //Opens the contents of the story file
   else if (!strcmp(argv[1], "-v")){
-    checkForSem();
-    sem = semget(KEY, 1, 0644);
-    value = semctl(sem, 0, GETVAL);
-    printf("Semaphore %d's value: %d\n", sem, value);
+    printStory();    
   }
 
-  //removes the semaphore
+  //Remove shared memory, semaphore and the story
   else if (!strcmp(argv[1], "-r")){
-    checkForSem();
+    printStory();
+    remove("Story");
+
+    shm = shmget(LINESIZE, sizeof(int), 0644);
+    shmctl(shm, IPC_RMID, 0);
+    printf("Removed Shared Memory\n");
+
     sem = semget(KEY, 1, 0644);
     semctl(sem, 0, IPC_RMID);
-    printf("Semaphore %d removed\n", sem);
+    printf("Semaphore %d removed\n", sem);   
   }
-  */
 
   //if incorrect arguments are used
   else{
     printf("Incorrect arguments\n");
-    printf("Try again using either \"-c N\", \"-v\", or \"-r\"\n");
+    printf("Try again using either \"-c\", \"-v\", or \"-r\"\n");
   }
 
   return 0;
