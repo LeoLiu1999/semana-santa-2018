@@ -15,6 +15,14 @@ int main(int argc, char **argv){
   int sem, fd, sizeLine;
   char *currLine;
 
+  union semun {
+    int              val;    /* Value for SETVAL */
+    struct semid_ds *buf;    /* Buffer for IPC_STAT, IPC_SET */
+    unsigned short  *array;  /* Array for GETALL, SETALL */
+    struct seminfo  *__buf;  /* Buffer for IPC_INFO
+				(Linux-specific) */
+  };
+
   union semun us;
   
   //If no command line arguments
@@ -35,7 +43,7 @@ int main(int argc, char **argv){
       printf("Semaphore already exists\n");
       return 0;
     }
-    us->val = 1;
+    us.val = 1;
     semctl(sem, 0, SETVAL, us); 
     printf("Set semaphore %d's value to %d\n", sem, semctl(sem, 0, GETVAL));
   }
