@@ -1,4 +1,4 @@
-#include "control.h"
+#include "headers.h"
 
 int main(int argc, char **argv){
 
@@ -43,16 +43,30 @@ int main(int argc, char **argv){
 
   //Remove shared memory, semaphore and the story
   else if (!strcmp(argv[1], "-r")){
-    printStory();
-    remove("Story");
+    sem = semget(KEY, 1, 0644);
+    if (sem == -1){
+      printf("Semaphore, shared memory, and story don't exist\n");
+      printf("Try running \"./control -c\"\n");
+      return 0;
+    }
 
+    printf("Wait your turn\n");
+    struct sembuf sBuf;
+    sBuf.sem_num = 0; //index we want to work on
+    sBuf.sem_op = -1; //Down the Semaphore
+    sBuf.sem_flg = SEM_UNDO; //Allow OS to undo operation
+    semop(sem, &sBuf, 1);
+    printf("Aight, you may have access now\n\n");
+
+    semctl(sem, 0, IPC_RMID);
+    printf("Semaphore %d removed\n", sem);
+    
     shm = shmget(LINESIZE, sizeof(int), 0644);
     shmctl(shm, IPC_RMID, 0);
     printf("Removed Shared Memory\n");
 
-    sem = semget(KEY, 1, 0644);
-    semctl(sem, 0, IPC_RMID);
-    printf("Semaphore %d removed\n", sem);   
+    printStory();
+    remove("Story");   
   }
 
   //if incorrect arguments are used

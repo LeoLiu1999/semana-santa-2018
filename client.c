@@ -1,5 +1,4 @@
-#include "client.h"
-#include "control.h"
+#include "headers.h"
 
 int main(){
   
@@ -16,7 +15,7 @@ int main(){
   sBuf.sem_op = -1; //Down the Semaphore
   sBuf.sem_flg = SEM_UNDO; //Allow OS to undo operation
   semop(sem, &sBuf, 1);
-  printf("Aight, you may use the semaphone now (I hope)\n");
+  printf("Aight, you may have access now\n\n");
 
   shm = shmget(LINESIZE, sizeof(int), 0644);
   int *sizeOfLine = shmat(shm, 0, 0644);

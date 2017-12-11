@@ -2,13 +2,13 @@ all: control.o client.o helpers.o
 	gcc -o control control.o helpers.o
 	gcc -o client client.o helpers.o
 
-helpers.o: helpers.c helpers.h
+helpers.o: helpers.c headers.h
 	gcc -c helpers.c
 
-control.o: control.c control.h
+control.o: control.c headers.h
 	gcc -c control.c
 
-client.o: client.c control.h
+client.o: client.c headers.h
 	gcc -c client.c
 
 clean: 

@@ -1,4 +1,4 @@
-#include "helpers.h"
+#include "headers.h"
 
 int checkForStory(int flags){
   int fd = open("Story", flags);
