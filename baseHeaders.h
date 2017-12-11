@@ -12,4 +12,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#define LINESIZE 6940
+#define KEY 694
+
 #endif

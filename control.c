@@ -1,8 +1,5 @@
 #include "control.h"
 
-#define LINESIZE 6940
-#define KEY 694
-
 int main(int argc, char **argv){
 
   int sem, fd, shm;

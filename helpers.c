@@ -1,7 +1,7 @@
 #include "helpers.h"
 
-int checkForStory(){
-  int fd = open("Story", O_RDONLY);
+int checkForStory(int flags){
+  int fd = open("Story", flags);
   if (fd == -1){
     printf("Story does not exist, create a story with ./control -c\n");
     exit(1);
@@ -10,7 +10,7 @@ int checkForStory(){
 }
 
 void printStory(){
-    int fd = checkForStory();
+    int fd = checkForStory( O_RDONLY);
     
     struct stat sb;
     stat("Story", &sb);

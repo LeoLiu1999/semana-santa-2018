@@ -3,7 +3,7 @@
 
 #include "baseHeaders.h"
 
-int checkForStory();
+int checkForStory( int);
 void printStory();
 
 #endif
