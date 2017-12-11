@@ -12,7 +12,8 @@ client.o: client.c control.h
 	gcc -c client.c
 
 clean: 
-	rm -rf *.o *~ control client debug
+	clear
+	rm -rf *.o *~ control client Story debug
 
 debugClient:
 	gcc -o debug -g client.c
